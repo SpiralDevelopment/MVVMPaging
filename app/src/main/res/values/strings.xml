@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MVVMPaging</string>
+    <string name="retry">Retry</string>
+    <string name="connection_error">Connection Problem!</string>
 </resources>

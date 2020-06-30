@@ -10,23 +10,44 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.spiraldev.mvvmpaging.R
-import com.spiraldev.mvvmpaging.data.remote.Api.IMAGES_URL
+import com.spiraldev.mvvmpaging.adapters.viewholders.MovieItemViewHolder
+import com.spiraldev.mvvmpaging.adapters.viewholders.NetworkStateViewHolder
+import com.spiraldev.mvvmpaging.data.remote.NetworkState
 import com.spiraldev.mvvmpaging.data.remote.vo.MovieModel
-import kotlinx.android.synthetic.main.movie_list_item.view.*
 
 
-class MoviesPagedListAdapter(val context: Context) :
-    PagedListAdapter<MovieModel, MoviesPagedListAdapter.MovieItemViewHolder>(MovieDiffCallback()) {
+class MoviesPagedListAdapter(private val retryCallback: () -> Unit) :
+    PagedListAdapter<MovieModel, RecyclerView.ViewHolder>(MovieDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovieItemViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val view: View = layoutInflater.inflate(R.layout.movie_list_item, parent, false)
-        return MovieItemViewHolder(view)
+    private var networkState: NetworkState? = null
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when (viewType) {
+            R.layout.movie_list_item -> MovieItemViewHolder.create(parent)
+            R.layout.network_state_item -> NetworkStateViewHolder.create(parent, retryCallback)
+            else -> throw IllegalArgumentException("Unknown view type")
+        }
     }
 
-    override fun onBindViewHolder(holder: MovieItemViewHolder, position: Int) {
-        holder.bind(getItem(position), context)
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (getItemViewType(position)) {
+            R.layout.movie_list_item -> (holder as MovieItemViewHolder).bind(getItem(position))
+            R.layout.network_state_item -> (holder as NetworkStateViewHolder).bind(networkState)
+        }
     }
+
+    override fun getItemViewType(position: Int): Int {
+        return if (hasExtraRow() && position == itemCount - 1) {
+            R.layout.network_state_item
+        } else {
+            R.layout.movie_list_item
+        }
+    }
+
+    private fun hasExtraRow(): Boolean {
+        return networkState != null && networkState != NetworkState.LOADED
+    }
+
 
     class MovieDiffCallback : DiffUtil.ItemCallback<MovieModel>() {
         override fun areItemsTheSame(oldItem: MovieModel, newItem: MovieModel): Boolean {
@@ -38,16 +59,23 @@ class MoviesPagedListAdapter(val context: Context) :
         }
     }
 
-
-    class MovieItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        fun bind(movie: MovieModel?, context: Context) {
-            itemView.cv_movie_title.text = movie?.title
-            itemView.cv_movie_release_date.text = movie?.releaseDate
-
-            val moviePosterURL = IMAGES_URL + movie?.posterPath
-            Glide.with(itemView.context)
-                .load(moviePosterURL)
-                .into(itemView.cv_iv_movie_poster);
+    fun setNetworkState(newNetworkState: NetworkState?) {
+        if (currentList != null) {
+            if (currentList!!.size != 0) {
+                val previousState = this.networkState
+                val hadExtraRow = hasExtraRow()
+                this.networkState = newNetworkState
+                val hasExtraRow = hasExtraRow()
+                if (hadExtraRow != hasExtraRow) {
+                    if (hadExtraRow) {
+                        notifyItemRemoved(super.getItemCount())
+                    } else {
+                        notifyItemInserted(super.getItemCount())
+                    }
+                } else if (hasExtraRow && previousState !== newNetworkState) {
+                    notifyItemChanged(itemCount - 1)
+                }
+            }
         }
     }
 }

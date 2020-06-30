@@ -1,53 +1,72 @@
 package com.spiraldev.mvvmpaging.ui
 
 import android.os.Bundle
+import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.seemenstask.di.ViewModelFactory
 import com.spiraldev.mvvmpaging.R
 import com.spiraldev.mvvmpaging.adapters.MoviesPagedListAdapter
 import com.spiraldev.mvvmpaging.data.remote.ApiService
-import com.spiraldev.mvvmpaging.data.remote.getService
+import com.spiraldev.mvvmpaging.data.remote.NetworkState
+import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : DaggerAppCompatActivity() {
 
-    lateinit var viewModel: MainActivityViewModel
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+    val viewModel by viewModels<MainActivityViewModel> { viewModelFactory }
+
     lateinit var moviesAdapter: MoviesPagedListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        initViewModel()
         initRecycler()
         initObserver()
     }
 
     private fun initRecycler() {
-        moviesAdapter = MoviesPagedListAdapter(this)
+        moviesAdapter = MoviesPagedListAdapter {
+            viewModel.retry()
+        }
 
-        movies_recycler.setHasFixedSize(true)
-        movies_recycler.adapter = moviesAdapter
-    }
+        val gridLayoutManager = GridLayoutManager(this, 3)
 
-    private fun initViewModel() {
-        val apiService: ApiService = getService()
-        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                @Suppress("UNCHECKED_CAST")
-                return MainActivityViewModel(apiService) as T
+        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                val viewType = moviesAdapter.getItemViewType(position)
+                if (viewType == R.layout.movie_list_item) return 1
+                else return 3
             }
-        }).get(MainActivityViewModel::class.java)
+        }
+
+        movies_recycler.adapter = moviesAdapter
+        movies_recycler.layoutManager = gridLayoutManager
+        movies_recycler.setHasFixedSize(true)
     }
 
     private fun initObserver() {
         viewModel.moviePagedList.observe(this, Observer {
             moviesAdapter.submitList(it)
         })
+
+        viewModel.getNetworkState()
+            .observe(this, Observer<NetworkState> {
+                progress_bar_main.visibility =
+                    if (viewModel.listIsEmpty() && it == NetworkState.LOADING) View.VISIBLE else View.GONE
+
+                txt_error_main.visibility =
+                    if (viewModel.listIsEmpty() && it.message != null) View.VISIBLE else View.GONE
+
+                moviesAdapter.setNetworkState(it)
+            })
     }
 }
