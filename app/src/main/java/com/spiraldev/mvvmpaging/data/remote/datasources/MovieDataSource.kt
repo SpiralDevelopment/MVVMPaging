@@ -29,10 +29,11 @@ class MovieDataSource(
 
     fun retry() {
         if (retryCompletable != null) {
-            compositeDisposable.add(retryCompletable!!
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ }, { Log.d("TAG", it.message) })
+            compositeDisposable.add(
+                retryCompletable!!
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({ }, { Log.d("TAG", it.message) })
             )
         }
     }
@@ -63,29 +64,25 @@ class MovieDataSource(
 
     override fun loadAfter(params: LoadParams<Int>, callback: LoadCallback<Int, MovieModel>) {
         networkState.postValue(NetworkState.LOADING)
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            compositeDisposable.add(
-                apiService.fetchMovies(params.key)
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(
-                        {
-                            if (it.totalPages >= params.key) {
-                                callback.onResult(it.movieList, params.key + 1)
-                            }
-
-                            setRetry(null)
-                            networkState.postValue(NetworkState.LOADED)
-                        },
-                        {
-                            Log.d("TAG", it.message)
-                            setRetry(Action { loadAfter(params, callback) })
-                            networkState.postValue(NetworkState.error(it.message))
+        compositeDisposable.add(
+            apiService.fetchMovies(params.key)
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                    {
+                        if (it.totalPages >= params.key) {
+                            callback.onResult(it.movieList, params.key + 1)
                         }
-                    )
-            )
-        }, 3000)
 
+                        setRetry(null)
+                        networkState.postValue(NetworkState.LOADED)
+                    },
+                    {
+                        Log.d("TAG", it.message)
+                        setRetry(Action { loadAfter(params, callback) })
+                        networkState.postValue(NetworkState.error(it.message))
+                    }
+                )
+        )
     }
 
     override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, MovieModel>) {
