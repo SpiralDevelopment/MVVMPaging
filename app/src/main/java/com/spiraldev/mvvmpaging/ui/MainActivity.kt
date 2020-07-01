@@ -8,6 +8,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.seemenstask.di.ViewModelFactory
 import com.spiraldev.mvvmpaging.R
 import com.spiraldev.mvvmpaging.adapters.MoviesPagedListAdapter
@@ -38,13 +39,13 @@ class MainActivity : DaggerAppCompatActivity() {
             viewModel.retry()
         }
 
-        val gridLayoutManager = GridLayoutManager(this, 3)
+        val gridLayoutManager = GridLayoutManager(this, 4, RecyclerView.VERTICAL, false)
 
         gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 val viewType = moviesAdapter.getItemViewType(position)
                 if (viewType == R.layout.movie_list_item) return 1
-                else return 3
+                else return 4
             }
         }
 

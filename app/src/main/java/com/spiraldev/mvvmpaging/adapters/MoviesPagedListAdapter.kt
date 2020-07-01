@@ -12,12 +12,12 @@ import com.bumptech.glide.Glide
 import com.spiraldev.mvvmpaging.R
 import com.spiraldev.mvvmpaging.adapters.viewholders.MovieItemViewHolder
 import com.spiraldev.mvvmpaging.adapters.viewholders.NetworkStateViewHolder
+import com.spiraldev.mvvmpaging.data.local.MovieEntity
 import com.spiraldev.mvvmpaging.data.remote.NetworkState
-import com.spiraldev.mvvmpaging.data.remote.vo.MovieModel
 
 
 class MoviesPagedListAdapter(private val retryCallback: () -> Unit) :
-    PagedListAdapter<MovieModel, RecyclerView.ViewHolder>(MovieDiffCallback()) {
+    PagedListAdapter<MovieEntity, RecyclerView.ViewHolder>(MovieDiffCallback()) {
 
     private var networkState: NetworkState? = null
 
@@ -49,13 +49,15 @@ class MoviesPagedListAdapter(private val retryCallback: () -> Unit) :
     }
 
 
-    class MovieDiffCallback : DiffUtil.ItemCallback<MovieModel>() {
-        override fun areItemsTheSame(oldItem: MovieModel, newItem: MovieModel): Boolean {
+    class MovieDiffCallback : DiffUtil.ItemCallback<MovieEntity>() {
+        override fun areItemsTheSame(oldItem: MovieEntity, newItem: MovieEntity): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: MovieModel, newItem: MovieModel): Boolean {
-            return oldItem == newItem
+        override fun areContentsTheSame(oldItem: MovieEntity, newItem: MovieEntity): Boolean {
+            return oldItem.title == newItem.title
+                    && oldItem.posterUrl == newItem.posterUrl
+                    && oldItem.voteAverage == newItem.voteAverage
         }
     }
 
