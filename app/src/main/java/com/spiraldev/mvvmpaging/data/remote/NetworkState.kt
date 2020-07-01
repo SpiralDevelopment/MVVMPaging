@@ -1,9 +1,5 @@
 package com.spiraldev.mvvmpaging.data.remote
 
-/**
- * Created by Ahmed Abd-Elmeged on 2/20/2018.
- */
-
 enum class Status {
     RUNNING,
     SUCCESS,
