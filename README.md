@@ -1,5 +1,5 @@
 # MVVMPaging
-> Demonstartions of using Paging Library with MVVM architecture. Samples fetches data about popular movies from [API](https://api.themoviedb.org/) and loads it into Grid Layout.
+> Demonstartions of using Paging Library with MVVM architecture.
 
 ## Screenshots
 
