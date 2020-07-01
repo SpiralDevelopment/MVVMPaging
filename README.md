@@ -13,3 +13,13 @@ This project hosts each sample app in separate repository branches.
 | [paging-dagger](https://github.com/SpiralDevelopment/MVVMPaging/tree/paging-dagger) | Paging Library + Architecture Components + Retrofit + RxJava + Dagger Android |
 | [paging-offline](https://github.com/SpiralDevelopment/MVVMPaging/tree/paging-offline) | Paging Library + Architecture Components + Retrofit + RxJava + Dagger Android + Offline-first|
 | [paging-dagger-hilt](https://github.com/SpiralDevelopment/MVVMPaging/tree/paging-dagger-hilt) | Paging Library + Architecture Components + Retrofit + RxJava + Dagger Hilt + Offline-first|
+
+
+## Online App Architecture
+
+![online-app](https://github.com/SpiralDevelopment/MVVMPaging/blob/paging-dagger-hilt/online_app_diagram.png)
+
+
+## Offline-First App Architecture
+
+![offline-app](https://github.com/SpiralDevelopment/MVVMPaging/blob/paging-dagger-hilt/offline_app_diagram.png)
