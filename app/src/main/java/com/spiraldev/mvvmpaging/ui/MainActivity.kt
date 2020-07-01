@@ -5,25 +5,18 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.seemenstask.di.ViewModelFactory
 import com.spiraldev.mvvmpaging.R
 import com.spiraldev.mvvmpaging.adapters.MoviesPagedListAdapter
-import com.spiraldev.mvvmpaging.data.remote.ApiService
 import com.spiraldev.mvvmpaging.data.remote.NetworkState
-import dagger.android.support.DaggerAppCompatActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
-import javax.inject.Inject
 
+@AndroidEntryPoint
+class MainActivity : AppCompatActivity() {
 
-class MainActivity : DaggerAppCompatActivity() {
-
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-    val viewModel by viewModels<MainActivityViewModel> { viewModelFactory }
+    val viewModel: MainActivityViewModel by viewModels()
 
     lateinit var moviesAdapter: MoviesPagedListAdapter
 

@@ -9,20 +9,21 @@ import com.spiraldev.mvvmpaging.data.remote.NetworkState
 import com.spiraldev.mvvmpaging.data.remote.POST_PER_PAGE
 import com.spiraldev.mvvmpaging.data.remote.utils.PagingRequestHelper
 import com.spiraldev.mvvmpaging.data.remote.vo.toMovieEntity
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.Executors
 
 class PagedListMovieBoundaryCallback(
     private val apiService: ApiService,
-    private val moviesDb: MoviesDatabase
+    private val moviesDb: MoviesDatabase,
+    val compositeDisposable: CompositeDisposable
 ) : PagedList.BoundaryCallback<MovieEntity>() {
 
     val networkState = MutableLiveData<NetworkState>()
 
     private var pageNum = 1
     private val executor = Executors.newSingleThreadExecutor()
-    private val helper =
-        PagingRequestHelper(executor)
+    private val helper = PagingRequestHelper(executor)
     private lateinit var rType: PagingRequestHelper.RequestType
 
     fun retry() {
@@ -50,13 +51,12 @@ class PagedListMovieBoundaryCallback(
         helper.runIfNotRunning(rType) { callback ->
             networkState.postValue(NetworkState.LOADING)
 
-            apiService.fetchPopularMovies(pageNum)
+            compositeDisposable.add(apiService.fetchPopularMovies(pageNum)
                 .map { response -> response.movieList.map { it.toMovieEntity() } }
                 .doOnSuccess {
                     moviesDb.moviesDao().insert(it)
                 }
                 .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
                 .subscribe(
                     {
                         networkState.postValue(NetworkState.LOADED)
@@ -66,7 +66,7 @@ class PagedListMovieBoundaryCallback(
                         networkState.postValue(NetworkState.error(it.message))
                         callback.recordFailure(it)
                     }
-                )
+                ))
         }
     }
 }

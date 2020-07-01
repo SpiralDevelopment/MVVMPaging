@@ -1,5 +1,6 @@
 package com.spiraldev.mvvmpaging.ui
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
@@ -13,7 +14,7 @@ import com.spiraldev.mvvmpaging.data.remote.datasources.PagedListMovieBoundaryCa
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
 
-class MainActivityViewModel @Inject constructor(
+class MainActivityViewModel @ViewModelInject constructor(
     private val apiService: ApiService,
     private val moviesDb: MoviesDatabase
 ) : ViewModel() {
@@ -24,7 +25,8 @@ class MainActivityViewModel @Inject constructor(
     private val boundaryCallback: PagedListMovieBoundaryCallback =
         PagedListMovieBoundaryCallback(
             apiService,
-            moviesDb
+            moviesDb,
+            compositeDisposable
         )
 
     init {

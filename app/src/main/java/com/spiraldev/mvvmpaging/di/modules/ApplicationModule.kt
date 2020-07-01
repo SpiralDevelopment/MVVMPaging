@@ -1,22 +1,29 @@
 package com.example.seemenstask.di.modules
 
+import android.app.Application
+import android.content.Context
+import com.spiraldev.mvvmpaging.data.local.MoviesDao
+import com.spiraldev.mvvmpaging.data.local.MoviesDatabase
 import com.spiraldev.mvvmpaging.data.remote.Api
 import com.spiraldev.mvvmpaging.data.remote.ApiService
 import dagger.Module
 import dagger.Provides
-import okhttp3.Cache
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
-import javax.inject.Named
 import javax.inject.Singleton
 
 
 @Module
-class ApiModule() {
+@InstallIn(ApplicationComponent::class)
+class ApplicationModule {
 
     @Provides
     @Singleton
@@ -59,4 +66,9 @@ class ApiModule() {
     fun provideApiClient(retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun providesMoviesDatabase(@ApplicationContext context: Context): MoviesDatabase =
+        MoviesDatabase.buildDatabase(context)
 }
