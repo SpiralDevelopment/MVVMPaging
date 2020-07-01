@@ -4,8 +4,8 @@
 ## Screenshots
 
 <p align="middle">
-  <img width="100" src="https://github.com/SpiralDevelopment/MVVMPaging/blob/paging-dagger-hilt/screenshots/sc1.jpg">
-  <img width="100" src="https://github.com/SpiralDevelopment/MVVMPaging/blob/paging-dagger-hilt/screenshots/sc2.jpg">
+  <img width="300" src="https://github.com/SpiralDevelopment/MVVMPaging/blob/paging-dagger-hilt/screenshots/sc1.jpg">
+  <img width="300" src="https://github.com/SpiralDevelopment/MVVMPaging/blob/paging-dagger-hilt/screenshots/sc2.jpg">
 </p>
 
 ## Variations
