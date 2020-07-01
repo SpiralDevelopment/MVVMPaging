@@ -22,7 +22,9 @@ There are 2 types of architecture used in the samples.
 
 Online app architecture fetches data from API and directly binds it to the UI. Used in [paging](https://github.com/DataSmoother/MVVMPaging/tree/paging) and [paging-dagger](https://github.com/SpiralDevelopment/MVVMPaging/tree/paging-dagger)
 
-![online-app](https://github.com/SpiralDevelopment/MVVMPaging/blob/paging-dagger-hilt/online_app_diagram.png)
+<p align="center">
+  <img src="https://github.com/SpiralDevelopment/MVVMPaging/blob/paging-dagger-hilt/online_app_diagram.png">
+</p>
 
 
 ### Offline-First App Architecture
